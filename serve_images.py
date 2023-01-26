@@ -11,6 +11,7 @@ def serve_converted_image():
     image = get_random_image()
     resp = flask.Response(create_bytearray_from_image(image))
     resp.headers["time_to_live"] = "100"
+    resp.headers["loop_delay"] = "0"
     return resp
 
 def create_bytearray_from_image(image):
@@ -32,9 +33,9 @@ def create_bytearray_from_image(image):
     return bytearray(byte_array)
 
 def get_random_image():
-    with open("previous_index.txt", "r") as f:
+    with open("/home/jbg/ledmatrix/previous_index.txt", "r") as f:
         previous_index = int(f.read())
-    images = [os.path.join("./images", i) for i in os.listdir("./images")]
+    images = [os.path.join("/home/jbg/ledmatrix/images", i) for i in os.listdir("/home/jbg/ledmatrix/images")]
     #random_int = random.randint(0, len(images) - 1)
     if previous_index >= len(images) - 1:
         previous_index = 0
@@ -42,7 +43,7 @@ def get_random_image():
         previous_index += 1
     #while random_int == previous_index:
     #    random_int = random.randint(0, len(images) - 1)
-    with open("previous_index.txt", "w") as f:
+    with open("/home/jbg/ledmatrix/previous_index.txt", "w") as f:
         f.write(str(previous_index))
     print(images[previous_index])
     return images[previous_index]
