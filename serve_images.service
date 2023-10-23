@@ -1,0 +1,11 @@
+[Unit]
+Description=Flask web server for ledmatrix gif serving
+[Install]
+WantedBy=multi-user.target
+[Service]
+User=jbg
+PermissionsStartOnly=true
+ExecStart=/home/jbg/dev/ledmatrix/venv/bin/python /home/jbg/dev/ledmatrix/serve_images.py
+TimeoutSec=600
+Restart=on-failure
+RuntimeDirectoryMode=755
