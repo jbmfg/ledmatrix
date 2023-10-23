@@ -9,9 +9,11 @@ app = flask.Flask(__name__)
 @app.route("/get_random_image", methods=["GET"])
 def serve_converted_image():
     image = get_random_image()
-    resp = flask.Response(create_bytearray_from_image(image))
+    image_byte_array, frame_count = create_bytearray_from_image(image)
+    resp = flask.Response(image_byte_array)
     resp.headers["time_to_live"] = "100"
-    resp.headers["loop_delay"] = "0"
+    resp.headers["loop_delay"] = ".5"
+    resp.headers["frame_count"] = str(frame_count)
     return resp
 
 def create_bytearray_from_image(image):
@@ -30,12 +32,14 @@ def create_bytearray_from_image(image):
                     converted = list(converted)
                     converted = [round(i/10) for i in converted]
                     byte_array.extend(list(converted))
-    return bytearray(byte_array)
+    return bytearray(byte_array), frames_count
 
 def get_random_image():
-    with open("/home/jbg/ledmatrix/previous_index.txt", "r") as f:
+    import logging
+    logging.basicConfig(filename='/home/jbg/dev/ledmatrix/matrix.log', level=logging.DEBUG)
+    with open("/home/jbg/dev/ledmatrix/previous_index.txt", "r") as f:
         previous_index = int(f.read())
-    images = [os.path.join("/home/jbg/ledmatrix/images", i) for i in os.listdir("/home/jbg/ledmatrix/images")]
+    images = [os.path.join("/home/jbg/dev/ledmatrix/images", i) for i in os.listdir("/home/jbg/dev/ledmatrix/images")]
     #random_int = random.randint(0, len(images) - 1)
     if previous_index >= len(images) - 1:
         previous_index = 0
@@ -43,9 +47,9 @@ def get_random_image():
         previous_index += 1
     #while random_int == previous_index:
     #    random_int = random.randint(0, len(images) - 1)
-    with open("/home/jbg/ledmatrix/previous_index.txt", "w") as f:
+    with open("/home/jbg/dev/ledmatrix/previous_index.txt", "w") as f:
         f.write(str(previous_index))
-    print(images[previous_index])
+    logging.info(images[previous_index])
     return images[previous_index]
 
 def main():
